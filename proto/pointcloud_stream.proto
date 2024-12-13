@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package pointcloud_stream;
+
+import "google/protobuf/empty.proto";
+
+message PointField {
+    string name = 1;       // Name of the field (e.g., x, y, z)
+    uint32 offset = 2;     // Offset of the field in the data array
+    uint32 datatype = 3;   // Datatype of the field (matches ROS sensor_msgs::PointField types)
+    uint32 count = 4;      // Number of elements in the field
+}
+
+message PointCloud2 {
+    // Standard header
+    string frame_id = 1;         // Coordinate frame ID
+    uint32 stamp_sec = 2;        // Timestamp seconds
+    uint32 stamp_nanosec = 3;    // Timestamp nanoseconds
+
+    // Point cloud dimensions
+    uint32 height = 4;           // Height of the point cloud
+    uint32 width = 5;            // Width of the point cloud
+
+    // Fields description
+    repeated PointField fields = 6; // List of fields (e.g., x, y, z, etc.)
+
+    // Point cloud properties
+    bool is_bigendian = 7;       // Whether data is in big-endian format
+    uint32 point_step = 8;       // Size of a point in bytes
+    uint32 row_step = 9;         // Size of a row in bytes
+
+    // Point cloud data
+    bytes data = 10;             // Binary serialized point cloud data
+
+    // Indicates if the point cloud is dense
+    bool is_dense = 11;
+}
+
+service PointCloudStreamer {
+    // Server streams PointCloud2 data to the client
+    rpc StreamPointCloud(google.protobuf.Empty) returns (stream PointCloud2);
+}
